@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk');
+/*const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
@@ -38,7 +38,8 @@ async function updateUser(jsonRequest){
 
 
 }
-/*    
+*/
+/*    1rst version without modify
 const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
 
@@ -47,35 +48,30 @@ exports.handler = async (event) => {
     
         
     var bodyJSON = JSON.parse(event.body);
-
-    "body": "{ \"userId\": \"usuario1\", \"name\": \"David\",  \"lastName\": \"Marchan\",
-    \"userName\": \"usuario1\", \"password\": \"1234\", \"email\": \"1234@gmail.com\",
-    \"avatar\": \"1234\", \"city\": \"Barcelona\", \"languaje\": \"ESP\",
-    \"gameCollection\": \"D&D-5e\"  }"
     
     var userId = bodyJSON.userId || null;
-    var name = bodyJSON.name|| null;
-    var lastName = bodyJSON.lastName || null;
-    var userName = bodyJSON.userName || null;
-    var password = bodyJSON.password || null;
+    var taskStatus = bodyJSON.taskStatus|| null;
+    var assignee = bodyJSON.assignee || null;
+    var taskDescription = bodyJSON.taskDescription || null;
+    var creationTimestamp = bodyJSON.creationTimestamp || null;
     
     
     console.log("userId", userId );
-    console.log("password", password );
-    console.log("name", name);
-    console.log("lastName", lastName);
-    console.log("userName", userName);
+    console.log("creationTimestamp", creationTimestamp );
+    console.log("taskStatus", taskStatus);
+    console.log("assignee", assignee);
+    console.log("taskDescription", taskDescription);
     
     const response = {
         "userId" : userId,
-        "password" : password,
-        "name" : name,
-        "lastName" : lastName,
-        "userName" : userName
+        "creationTimestamp" : creationTimestamp,
+        "taskStatus" : taskStatus,
+        "assignee" : assignee,
+        "taskDescription" : taskDescription
         };
 
     try {
-    await updateTask(userId, password, name, lastName, userName );
+    await updateTask(userId, creationTimestamp, taskStatus, assignee, taskDescription );
         return {statusCode: 200, 
                 body: JSON.stringify(response)};
     } catch (err) {
@@ -83,14 +79,14 @@ exports.handler = async (event) => {
     }
 };
 
-async function updateTask(userid, password, name, lastName, userName ){
+async function updateTask(userid, creationtimestamp, taskstatus, assignee, taskdescription ){
   try {
     await ddb.update({
         TableName: 'USERS_BGG', 
-        Key: { userId : userid, password : password},
-        UpdateExpression: 'SET #state = :st, #lastName = :ass, #text = :txt',
-        ExpressionAttributeNames: { '#state': 'name', '#lastName' : 'lastName', '#text' : 'userName' }, 
-        ExpressionAttributeValues: {':st': name , ':ass' : lastName, ':txt' : userName},
+        Key: { userId : userid, creationTimestamp : creationtimestamp},
+        UpdateExpression: 'SET #state = :st, #assignee = :ass, #text = :txt',
+        ExpressionAttributeNames: { '#state': 'taskStatus', '#assignee' : 'assignee', '#text' : 'taskDescription' }, 
+        ExpressionAttributeValues: {':st': taskstatus , ':ass' : assignee, ':txt' : taskdescription},
         ReturnValues:"UPDATED_NEW"   
     }).promise();
   } catch (err) {
@@ -98,3 +94,75 @@ async function updateTask(userid, password, name, lastName, userName ){
   }
 }
 */
+
+ /*
+    my input example
+    "body": "{ \"userId\": \"usuario1\", \"name\": \"David\",  \"lastName\": \"Marchan\",
+    \"userName\": \"usuario1\", \"password\": \"1234\", \"email\": \"1234@gmail.com\",
+    \"avatar\": \"1234\", \"city\": \"Barcelona\", \"languaje\": \"ESP\",
+    \"gameCollection\": \"D&D-5e\"  }"
+*/
+
+const AWS = require('aws-sdk');
+const ddb = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = async (event) => {
+    console.log(event);
+    
+        
+    var bodyJSON = JSON.parse(event.body);
+    
+    var userId = bodyJSON.userId || null;
+    var name = bodyJSON.name|| null;
+    var lastName = bodyJSON.lastName || null;
+    var userName = bodyJSON.userName || null;
+    var password = bodyJSON.password || null;
+    var email = bodyJSON.email || null ;
+    var avatar = bodyJSON.avatar || null ;
+    var city = bodyJSON.city || null ;
+    var languaje = bodyJSON.languaje || null ;
+    var gameCollection = bodyJSON.gameCollection || null ;
+    /*
+    console.log("userId", userId );
+    console.log("creationTimestamp", creationTimestamp );
+    console.log("taskStatus", taskStatus);
+    console.log("assignee", assignee);
+    console.log("taskDescription", taskDescription);
+    */
+    const response = {
+        "userId" : userId,
+        "name" : name,
+        "lastName" : lastName,
+        "userName" : userName,
+        "password" : password,
+        "email" : email,
+        "avatar" : avatar,
+        "city" : city,
+        "languaje" : languaje,
+        "gameCollection" : gameCollection
+
+        };
+
+    try {
+    await updateTask(userId, name, lastName, userName, password, email, avatar, city, languaje, gameCollection);
+        return {statusCode: 200, 
+                body: JSON.stringify(response)};
+    } catch (err) {
+        return { error: err };
+    }
+};
+
+async function updateTask(userId, name, lastName, userName, password, email, avatar, city, languaje, gameCollection){
+  try {
+    await ddb.update({
+        TableName: 'USERS_BGG', 
+        Key: { userId : userId},
+        UpdateExpression: 'SET #name = :name, #lastName = :lastName, #userName = :userName, #password = :password, #email = :email, #avatar = :avatar, #city = :city, #languaje = :languaje, #gameCollection = :gameCollection',
+        ExpressionAttributeNames: {'#name' : 'name', '#lastName' : 'lastName', '#userName' : 'userName', '#password' : 'password', '#email' : 'email', '#avatar' : 'avatar', '#city' : 'city', '#languaje' : 'languaje', '#gameCollection' : 'gameCollection'},
+        ExpressionAttributeValues: {':name': name, ':lastName': lastName, ':userName' : userName, ':password':password, ':email': email, ':avatar' : avatar, ':city': city, ':languaje': languaje, ':gameCollection': gameCollection},
+        ReturnValues:"UPDATED_NEW"  
+    }).promise();
+  } catch (err) {
+    return err;
+  }
+}
