@@ -1,0 +1,8 @@
+//create
+{
+    "body": "{ \"userId\": \"usuario1\", \"name\": \"David\",  \"lastName\": \"Marchan\",  \"userName\": \"usuario1\", \"password\": \"1234\", \"email\": \"1234@gmail.com\", \"avatar\": \"1234\",\"city\": \"Barcelona\", \"languaje\": \"ESP\",  \"gameCollection\": \"D&D-5e\"  }"
+}
+//fail to create missing the userName
+{
+    "body": "{ \"name\": \"David\",  \"lastName\": \"Marchan\", \"password\": \"1234\", \"email\": \"1234@gmail.com\", \"avatar\": \"1234\",\"city\": \"Barcelona\", \"languaje\": \"ESP\",  \"gameCollection\": \"D&D-5e\"  }"
+}
